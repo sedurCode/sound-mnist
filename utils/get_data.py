@@ -1,7 +1,7 @@
 import utils
 from sklearn.model_selection import train_test_split
 
-def get_all():
+def get_all(config):
     mfccs, labels = utils.wav2mfcc.get_data()
 
     dim_1 = mfccs.shape[1]
@@ -17,6 +17,6 @@ def get_all():
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1, random_state=1)
 
-    model = utils.model.get_cnn_model(input_shape, classes)
+    model = utils.model.get_cnn_model(input_shape, classes, config)
 
     return X_train, X_test, y_train, y_test, model

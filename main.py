@@ -1,23 +1,37 @@
-from comet_ml import Experiment
-experiment = Experiment(project_name="soundmnist")
-
+import wandb
+from wandb.keras import WandbCallback
 from utils import model, wav2mfcc, get_data
 import test
+import tensorflow as tf
 
-# Tensorboard
-import keras
-keras_callback = keras.callbacks.TensorBoard(log_dir='./Graph', histogram_freq=1,
-                                             write_graph=True, write_images=True)
+if __name__ == "__main__":
+  run = wandb.init(project="soundmnist", 
+                  config={"learning_rate": 0.005,
+                          "batch_size": 64,
+                          "epochs": 800,
+                          "validation_split": 0.1,
+                          "loss_function": "categorical_crossentropy",
+                          "optimizer": 'Adadelta',
+                          "architecture": "CNN",
+                          "dataset": "audio_mnist"})
 
-X_train, X_test, y_train, y_test, cnn_model = get_data.get_all()
+  config = wandb.config
+  
+  X_train, X_test, y_train, y_test, cnn_model = get_data.get_all(config)
 
-print(cnn_model.summary())
+  print(cnn_model.summary())
+  cnn_model.fit(X_train, y_train, 
+                batch_size=config.batch_size, 
+                epochs=config.epochs, 
+                verbose=1, 
+                validation_split=config.validation_split, 
+                callbacks=[WandbCallback()])
 
-cnn_model.fit(X_train, y_train, batch_size=64, epochs=50, verbose=1, validation_split=0.1, callbacks=[keras_callback])
+  cnn_model.save('trained_model_custom.h5')
 
-cnn_model.save('trained_model.h5')
+  test.check_preds(X_test, y_test)
 
-test.check_preds(X_test, y_test)
+  run.finish()
 
 ''' OUTPUT 
 

@@ -1,10 +1,11 @@
 import keras
+import wandb
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, Flatten, Conv2D, MaxPooling2D, BatchNormalization
 
 #from ann_visualizer.visualize import ann_viz
 
-def get_cnn_model(input_shape, num_classes):
+def get_cnn_model(input_shape, num_classes, config):
     model = Sequential()
 
     model.add(Conv2D(32, kernel_size=(2, 2), activation='relu', input_shape=input_shape))
@@ -28,7 +29,7 @@ def get_cnn_model(input_shape, num_classes):
     model.add(BatchNormalization())
     model.add(Dropout(0.4))
     model.add(Dense(num_classes, activation='softmax'))
-    model.compile(loss="categorical_crossentropy", optimizer='Adadelta', metrics=['accuracy'])
+    model.compile(loss=config.loss_function, optimizer=config.optimizer, metrics=['accuracy'])
 
     return model
 
